@@ -2,49 +2,33 @@ package com.apps.quantitymeasurement;
 
 public class QuantityMeasurementApp {
 
-    public static class Length {
-        private final double value;
-        private final LengthUnit unit;
+    public static boolean demonstrateLengthEquality(Length length1, Length length2) {
+        return length1.equals(length2);
+    }
 
-        public enum LengthUnit {
-            FEET(12.0),
-            INCHES(1.0),
-            YARDS(36.0),
-            CENTIMETERS(0.393701);
+    public static boolean demonstrateLengthComparison(double v1, Length.LengthUnit u1, double v2, Length.LengthUnit u2) {
+        Length l1 = new Length(v1, u1);
+        Length l2 = new Length(v2, u2);
+        return l1.equals(l2);
+    }
 
-            private final double conversionFactor;
+    public static Length demonstrateLengthConversion(double value, Length.LengthUnit fromUnit, Length.LengthUnit toUnit) {
+        Length l = new Length(value, fromUnit);
+        return l.convertTo(toUnit);
+    }
 
-            LengthUnit(double conversionFactor) {
-                this.conversionFactor = conversionFactor;
-            }
-
-            public double getConversionFactor() {
-                return conversionFactor;
-            }
-        }
-
-        public Length(double value, LengthUnit unit) {
-            this.value = value;
-            this.unit = unit;
-        }
-
-        private double toBaseUnit() {
-            return this.value * this.unit.getConversionFactor();
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) return true;
-            if (obj == null || getClass() != obj.getClass()) return false;
-            Length that = (Length) obj;
-            if (this.unit == null || that.unit == null) return false;
-            return Double.compare(this.toBaseUnit(), that.toBaseUnit()) == 0;
-        }
+    public static Length demonstrateLengthConversion(Length length, Length.LengthUnit toUnit) {
+        return length.convertTo(toUnit);
     }
 
     public static void main(String[] args) {
-        Length l1 = new Length(1.0, Length.LengthUnit.YARDS);
-        Length l2 = new Length(3.0, Length.LengthUnit.FEET);
-        System.out.println(l1.equals(l2));
+        Length a = new Length(1.0, Length.LengthUnit.YARDS);
+        Length b = new Length(3.0, Length.LengthUnit.FEET);
+        System.out.println(demonstrateLengthEquality(a, b));
+
+        System.out.println(demonstrateLengthConversion(1.0, Length.LengthUnit.FEET, Length.LengthUnit.INCHES));
+
+        Length c = new Length(2.0, Length.LengthUnit.YARDS);
+        System.out.println(demonstrateLengthConversion(c, Length.LengthUnit.INCHES));
     }
 }
