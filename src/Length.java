@@ -4,23 +4,6 @@ public class Length {
     private final double value;
     private final LengthUnit unit;
 
-    public enum LengthUnit {
-        FEET(12.0),
-        INCHES(1.0),
-        YARDS(36.0),
-        CENTIMETERS(0.393701);
-
-        private final double factor;
-
-        LengthUnit(double factor) {
-            this.factor = factor;
-        }
-
-        public double getFactor() {
-            return factor;
-        }
-    }
-
     public Length(double value, LengthUnit unit) {
         if (!Double.isFinite(value)) throw new IllegalArgumentException();
         if (unit == null) throw new IllegalArgumentException();
@@ -28,36 +11,52 @@ public class Length {
         this.unit = unit;
     }
 
+    public double getValue() {
+        return value;
+    }
+
+    public LengthUnit getUnit() {
+        return unit;
+    }
+
     private double toBase() {
-        return value * unit.getFactor();
+        return unit.convertToBaseUnit(value);
     }
 
     public Length convertTo(LengthUnit target) {
         if (target == null) throw new IllegalArgumentException();
         double base = toBase();
-        double result = base / target.getFactor();
-        return new Length(result, target);
+        double converted = target.convertFromBaseUnit(base);
+        return new Length(converted, target);
     }
 
     public static double convert(double value, LengthUnit source, LengthUnit target) {
         if (!Double.isFinite(value)) throw new IllegalArgumentException();
         if (source == null || target == null) throw new IllegalArgumentException();
-        double base = value * source.getFactor();
-        return base / target.getFactor();
+        double base = source.convertToBaseUnit(value);
+        return target.convertFromBaseUnit(base);
     }
 
     public Length add(Length other) {
         if (other == null) throw new IllegalArgumentException();
         double sumBase = this.toBase() + other.toBase();
-        double result = sumBase / this.unit.getFactor();
+        double result = unit.convertFromBaseUnit(sumBase);
         return new Length(result, this.unit);
+    }
+
+    public Length add(Length other, LengthUnit target) {
+        if (other == null) throw new IllegalArgumentException();
+        if (target == null) throw new IllegalArgumentException();
+        double sumBase = this.toBase() + other.toBase();
+        double result = target.convertFromBaseUnit(sumBase);
+        return new Length(result, target);
     }
 
     public static Length add(Length l1, Length l2, LengthUnit target) {
         if (l1 == null || l2 == null) throw new IllegalArgumentException();
         if (target == null) throw new IllegalArgumentException();
         double sumBase = l1.toBase() + l2.toBase();
-        double result = sumBase / target.getFactor();
+        double result = target.convertFromBaseUnit(sumBase);
         return new Length(result, target);
     }
 
@@ -67,6 +66,11 @@ public class Length {
         if (obj == null || getClass() != obj.getClass()) return false;
         Length that = (Length) obj;
         return Double.compare(this.toBase(), that.toBase()) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Double.hashCode(toBase());
     }
 
     @Override
