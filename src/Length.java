@@ -22,6 +22,8 @@ public class Length {
     }
 
     public Length(double value, LengthUnit unit) {
+        if (!Double.isFinite(value)) throw new IllegalArgumentException();
+        if (unit == null) throw new IllegalArgumentException();
         this.value = value;
         this.unit = unit;
     }
@@ -57,15 +59,23 @@ public class Length {
         return base / target.getConversionFactor();
     }
 
+    public Length add(Length other) {
+        if (other == null) throw new IllegalArgumentException();
+        double sumBase = this.toBaseUnit() + other.toBaseUnit();
+        double result = sumBase / this.unit.getConversionFactor();
+        return new Length(result, this.unit);
+    }
+
+    public static Length add(Length l1, Length l2, LengthUnit targetUnit) {
+        if (l1 == null || l2 == null) throw new IllegalArgumentException();
+        if (targetUnit == null) throw new IllegalArgumentException();
+        double sumBase = l1.toBaseUnit() + l2.toBaseUnit();
+        double result = sumBase / targetUnit.getConversionFactor();
+        return new Length(result, targetUnit);
+    }
+
     @Override
     public String toString() {
         return String.format("%.2f %s", value, unit);
-    }
-
-    public static void main(String[] args) {
-        Length l1 = new Length(1.0, LengthUnit.FEET);
-        Length l2 = new Length(12.0, LengthUnit.INCHES);
-        System.out.println(l1.equals(l2));
-        System.out.println(convert(3.0, LengthUnit.FEET, LengthUnit.INCHES));
     }
 }

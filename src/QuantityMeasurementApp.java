@@ -21,14 +21,25 @@ public class QuantityMeasurementApp {
         return length.convertTo(toUnit);
     }
 
+    public static Length demonstrateAddition(Length l1, Length l2) {
+        return l1.add(l2);
+    }
+
+    public static Length demonstrateAddition(Length l1, Length l2, Length.LengthUnit targetUnit) {
+        return Length.add(l1, l2, targetUnit);
+    }
+
     public static void main(String[] args) {
-        Length a = new Length(1.0, Length.LengthUnit.YARDS);
-        Length b = new Length(3.0, Length.LengthUnit.FEET);
+        Length a = new Length(1.0, Length.LengthUnit.FEET);
+        Length b = new Length(12.0, Length.LengthUnit.INCHES);
         System.out.println(demonstrateLengthEquality(a, b));
 
         System.out.println(demonstrateLengthConversion(1.0, Length.LengthUnit.FEET, Length.LengthUnit.INCHES));
 
-        Length c = new Length(2.0, Length.LengthUnit.YARDS);
-        System.out.println(demonstrateLengthConversion(c, Length.LengthUnit.INCHES));
+        Length c = new Length(1.0, Length.LengthUnit.YARDS);
+        Length d = new Length(3.0, Length.LengthUnit.FEET);
+        System.out.println(demonstrateAddition(c, d));
+
+        System.out.println(demonstrateAddition(a, b, Length.LengthUnit.FEET));
     }
 }
