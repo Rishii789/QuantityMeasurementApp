@@ -10,14 +10,14 @@ public class Length {
         YARDS(36.0),
         CENTIMETERS(0.393701);
 
-        private final double conversionFactor;
+        private final double factor;
 
-        LengthUnit(double conversionFactor) {
-            this.conversionFactor = conversionFactor;
+        LengthUnit(double factor) {
+            this.factor = factor;
         }
 
-        public double getConversionFactor() {
-            return conversionFactor;
+        public double getFactor() {
+            return factor;
         }
     }
 
@@ -28,54 +28,49 @@ public class Length {
         this.unit = unit;
     }
 
-    private double toBaseUnit() {
-        return this.value * this.unit.getConversionFactor();
+    private double toBase() {
+        return value * unit.getFactor();
     }
 
-    private boolean compare(Length thatLength) {
-        return Double.compare(this.toBaseUnit(), thatLength.toBaseUnit()) == 0;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Length that = (Length) o;
-        if (this.unit == null || that.unit == null) return false;
-        return compare(that);
-    }
-
-    public Length convertTo(LengthUnit targetUnit) {
-        if (targetUnit == null) throw new IllegalArgumentException();
-        double base = toBaseUnit();
-        double converted = base / targetUnit.getConversionFactor();
-        return new Length(converted, targetUnit);
+    public Length convertTo(LengthUnit target) {
+        if (target == null) throw new IllegalArgumentException();
+        double base = toBase();
+        double result = base / target.getFactor();
+        return new Length(result, target);
     }
 
     public static double convert(double value, LengthUnit source, LengthUnit target) {
         if (!Double.isFinite(value)) throw new IllegalArgumentException();
         if (source == null || target == null) throw new IllegalArgumentException();
-        double base = value * source.getConversionFactor();
-        return base / target.getConversionFactor();
+        double base = value * source.getFactor();
+        return base / target.getFactor();
     }
 
     public Length add(Length other) {
         if (other == null) throw new IllegalArgumentException();
-        double sumBase = this.toBaseUnit() + other.toBaseUnit();
-        double result = sumBase / this.unit.getConversionFactor();
+        double sumBase = this.toBase() + other.toBase();
+        double result = sumBase / this.unit.getFactor();
         return new Length(result, this.unit);
     }
 
-    public static Length add(Length l1, Length l2, LengthUnit targetUnit) {
+    public static Length add(Length l1, Length l2, LengthUnit target) {
         if (l1 == null || l2 == null) throw new IllegalArgumentException();
-        if (targetUnit == null) throw new IllegalArgumentException();
-        double sumBase = l1.toBaseUnit() + l2.toBaseUnit();
-        double result = sumBase / targetUnit.getConversionFactor();
-        return new Length(result, targetUnit);
+        if (target == null) throw new IllegalArgumentException();
+        double sumBase = l1.toBase() + l2.toBase();
+        double result = sumBase / target.getFactor();
+        return new Length(result, target);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Length that = (Length) obj;
+        return Double.compare(this.toBase(), that.toBase()) == 0;
     }
 
     @Override
     public String toString() {
-        return String.format("%.2f %s", value, unit);
+        return value + " " + unit;
     }
 }
